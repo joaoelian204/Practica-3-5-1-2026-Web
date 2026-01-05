@@ -1,0 +1,380 @@
+═══════════════════════════════════════════════════════════════════
+  🧪 EJEMPLOS DE PRUEBAS - SISTEMA MCP + GEMINI AI
+═══════════════════════════════════════════════════════════════════
+
+📋 ÍNDICE:
+  1. Verificación de Servicios
+  2. Crear Clientes (REST Directo)
+  3. Probar MCP Server (JSON-RPC)
+  4. Probar con Gemini AI (Lenguaje Natural)
+  5. Casos de Uso Completos
+
+═══════════════════════════════════════════════════════════════════
+  1️⃣  VERIFICACIÓN DE SERVICIOS
+═══════════════════════════════════════════════════════════════════
+
+# 1.1 Verificar API Gateway
+curl http://localhost:3000/api/procesador/estado
+
+# 1.2 Verificar MCP Server
+curl http://localhost:3001/health
+
+# 1.3 Listar Tools disponibles
+curl http://localhost:3001/tools
+
+# 1.4 Ver clientes existentes
+curl http://localhost:3002/clientes
+
+# 1.5 Ver reservas existentes
+curl http://localhost:3003/reservas
+
+
+═══════════════════════════════════════════════════════════════════
+  2️⃣  CREAR CLIENTES (REST DIRECTO)
+═══════════════════════════════════════════════════════════════════
+
+# 2.1 Crear Cliente: Juan Pérez
+curl -X POST http://localhost:3002/clientes ^
+  -H "Content-Type: application/json" ^
+  -d "{\"nombre\":\"Juan Perez\",\"email\":\"juan.perez@ejemplo.com\",\"telefono\":\"+57 300 123 4567\"}"
+
+# 2.2 Crear Cliente: María García
+curl -X POST http://localhost:3002/clientes ^
+  -H "Content-Type: application/json" ^
+  -d "{\"nombre\":\"Maria Garcia\",\"email\":\"maria.garcia@ejemplo.com\",\"telefono\":\"+57 301 987 6543\"}"
+
+# 2.3 Crear Cliente: Carlos López
+curl -X POST http://localhost:3002/clientes ^
+  -H "Content-Type: application/json" ^
+  -d "{\"nombre\":\"Carlos Lopez\",\"email\":\"carlos.lopez@ejemplo.com\",\"telefono\":\"+57 302 555 1234\"}"
+
+# 2.4 Crear Cliente: Ana Martínez
+curl -X POST http://localhost:3002/clientes ^
+  -H "Content-Type: application/json" ^
+  -d "{\"nombre\":\"Ana Martinez\",\"email\":\"ana.martinez@ejemplo.com\",\"telefono\":\"+57 303 444 5555\"}"
+
+
+═══════════════════════════════════════════════════════════════════
+  3️⃣  PROBAR MCP SERVER (JSON-RPC 2.0)
+═══════════════════════════════════════════════════════════════════
+
+# 3.1 Listar Tools via JSON-RPC
+curl -X POST http://localhost:3001/rpc ^
+  -H "Content-Type: application/json" ^
+  -d "{\"jsonrpc\":\"2.0\",\"method\":\"tools/list\",\"id\":1}"
+
+# 3.2 Ejecutar Tool: buscar_cliente por ID
+curl -X POST http://localhost:3001/rpc ^
+  -H "Content-Type: application/json" ^
+  -d "{\"jsonrpc\":\"2.0\",\"method\":\"tools/call\",\"params\":{\"name\":\"buscar_cliente\",\"arguments\":{\"id\":1}},\"id\":2}"
+
+# 3.3 Ejecutar Tool: buscar_cliente por nombre
+curl -X POST http://localhost:3001/rpc ^
+  -H "Content-Type: application/json" ^
+  -d "{\"jsonrpc\":\"2.0\",\"method\":\"tools/call\",\"params\":{\"name\":\"buscar_cliente\",\"arguments\":{\"nombre\":\"Juan\"}},\"id\":3}"
+
+# 3.4 Ejecutar Tool: buscar_cliente por email
+curl -X POST http://localhost:3001/rpc ^
+  -H "Content-Type: application/json" ^
+  -d "{\"jsonrpc\":\"2.0\",\"method\":\"tools/call\",\"params\":{\"name\":\"buscar_cliente\",\"arguments\":{\"email\":\"maria.garcia@ejemplo.com\"}},\"id\":4}"
+
+# 3.5 Ejecutar Tool: validar_disponibilidad
+curl -X POST http://localhost:3001/rpc ^
+  -H "Content-Type: application/json" ^
+  -d "{\"jsonrpc\":\"2.0\",\"method\":\"tools/call\",\"params\":{\"name\":\"validar_disponibilidad\",\"arguments\":{\"fechaReserva\":\"2026-01-30T10:00:00Z\",\"duracionMinutos\":60}},\"id\":5}"
+
+# 3.6 Ejecutar Tool: crear_reserva
+curl -X POST http://localhost:3001/rpc ^
+  -H "Content-Type: application/json" ^
+  -d "{\"jsonrpc\":\"2.0\",\"method\":\"tools/call\",\"params\":{\"name\":\"crear_reserva\",\"arguments\":{\"clienteId\":1,\"servicioNombre\":\"Corte de cabello\",\"fechaReserva\":\"2026-01-30T10:00:00Z\",\"duracionMinutos\":60,\"notas\":\"Cliente prefiere estilo clásico\"}},\"id\":6}"
+
+
+═══════════════════════════════════════════════════════════════════
+  4️⃣  PROBAR CON GEMINI AI (LENGUAJE NATURAL)
+═══════════════════════════════════════════════════════════════════
+
+⚠️  IMPORTANTE: Debes configurar tu GEMINI_API_KEY en el archivo .env
+   1. Obtén tu API Key en: https://aistudio.google.com/app/apikey
+   2. Edita .env y reemplaza: GEMINI_API_KEY=tu_api_key_real
+   3. Reinicia: docker-compose restart api-gateway
+
+───────────────────────────────────────────────────────────────────
+  4.1 BUSCAR CLIENTES (Tool: buscar_cliente)
+───────────────────────────────────────────────────────────────────
+
+# Buscar por nombre
+curl -X POST http://localhost:3000/api/procesador ^
+  -H "Content-Type: application/json" ^
+  -d "{\"mensaje\":\"Busca el cliente Juan Perez\"}"
+
+# Buscar por email
+curl -X POST http://localhost:3000/api/procesador ^
+  -H "Content-Type: application/json" ^
+  -d "{\"mensaje\":\"Busca el cliente con email maria.garcia@ejemplo.com\"}"
+
+# Buscar múltiples
+curl -X POST http://localhost:3000/api/procesador ^
+  -H "Content-Type: application/json" ^
+  -d "{\"mensaje\":\"Muéstrame todos los clientes que se llaman Maria\"}"
+
+# Pregunta abierta
+curl -X POST http://localhost:3000/api/procesador ^
+  -H "Content-Type: application/json" ^
+  -d "{\"mensaje\":\"Quién es el cliente con ID 1?\"}"
+
+
+───────────────────────────────────────────────────────────────────
+  4.2 VALIDAR DISPONIBILIDAD (Tool: validar_disponibilidad)
+───────────────────────────────────────────────────────────────────
+
+# Validar fecha específica
+curl -X POST http://localhost:3000/api/procesador ^
+  -H "Content-Type: application/json" ^
+  -d "{\"mensaje\":\"Está disponible el 30 de enero de 2026 a las 10:00 AM?\"}"
+
+# Validar otra fecha
+curl -X POST http://localhost:3000/api/procesador ^
+  -H "Content-Type: application/json" ^
+  -d "{\"mensaje\":\"Hay disponibilidad para el 15 de febrero de 2026 a las 3 PM?\"}"
+
+# Pregunta informal
+curl -X POST http://localhost:3000/api/procesador ^
+  -H "Content-Type: application/json" ^
+  -d "{\"mensaje\":\"Puedo hacer una reserva para mañana a las 10?\"}"
+
+
+───────────────────────────────────────────────────────────────────
+  4.3 CREAR RESERVAS (Tool: crear_reserva)
+───────────────────────────────────────────────────────────────────
+
+# Reserva simple
+curl -X POST http://localhost:3000/api/procesador ^
+  -H "Content-Type: application/json" ^
+  -d "{\"mensaje\":\"Crea una reserva de corte de cabello para Juan Perez el 30 de enero de 2026 a las 10 AM\"}"
+
+# Reserva con duración específica
+curl -X POST http://localhost:3000/api/procesador ^
+  -H "Content-Type: application/json" ^
+  -d "{\"mensaje\":\"Quiero agendar un masaje relajante de 90 minutos para Maria Garcia el 5 de febrero de 2026 a las 2 PM\"}"
+
+# Reserva con más detalles
+curl -X POST http://localhost:3000/api/procesador ^
+  -H "Content-Type: application/json" ^
+  -d "{\"mensaje\":\"Necesito reservar una consulta médica para Carlos Lopez el 10 de febrero a las 9 AM por 2 horas\"}"
+
+# Lenguaje muy natural
+curl -X POST http://localhost:3000/api/procesador ^
+  -H "Content-Type: application/json" ^
+  -d "{\"mensaje\":\"Hola, me gustaría agendar un corte de pelo para Ana Martinez el próximo viernes a las 4 de la tarde\"}"
+
+
+───────────────────────────────────────────────────────────────────
+  4.4 CONSULTAS COMPLEJAS (Múltiples Tools)
+───────────────────────────────────────────────────────────────────
+
+# Gemini ejecutará buscar_cliente + consultar reservas
+curl -X POST http://localhost:3000/api/procesador ^
+  -H "Content-Type: application/json" ^
+  -d "{\"mensaje\":\"Cuántas reservas tiene Juan Perez?\"}"
+
+# Gemini ejecutará buscar_cliente + validar_disponibilidad + crear_reserva
+curl -X POST http://localhost:3000/api/procesador ^
+  -H "Content-Type: application/json" ^
+  -d "{\"mensaje\":\"Quiero hacer una reserva de spa para el cliente maria.garcia@ejemplo.com el 20 de marzo a las 11 AM\"}"
+
+# Conversación natural
+curl -X POST http://localhost:3000/api/procesador ^
+  -H "Content-Type: application/json" ^
+  -d "{\"mensaje\":\"Hola, necesito ayuda para agendar una cita\"}"
+
+
+═══════════════════════════════════════════════════════════════════
+  5️⃣  CASOS DE USO COMPLETOS
+═══════════════════════════════════════════════════════════════════
+
+───────────────────────────────────────────────────────────────────
+  CASO 1: Flujo Completo - Nueva Reserva
+───────────────────────────────────────────────────────────────────
+
+# Paso 1: Crear cliente
+curl -X POST http://localhost:3002/clientes ^
+  -H "Content-Type: application/json" ^
+  -d "{\"nombre\":\"Pedro Ramirez\",\"email\":\"pedro@ejemplo.com\",\"telefono\":\"+57 300 111 2222\"}"
+
+# Paso 2: Buscar cliente (con IA)
+curl -X POST http://localhost:3000/api/procesador ^
+  -H "Content-Type: application/json" ^
+  -d "{\"mensaje\":\"Busca a Pedro Ramirez\"}"
+
+# Paso 3: Validar disponibilidad (con IA)
+curl -X POST http://localhost:3000/api/procesador ^
+  -H "Content-Type: application/json" ^
+  -d "{\"mensaje\":\"Está libre el 20 de marzo de 2026 a las 11 AM?\"}"
+
+# Paso 4: Crear reserva completa (con IA - ejecuta 3 tools)
+curl -X POST http://localhost:3000/api/procesador ^
+  -H "Content-Type: application/json" ^
+  -d "{\"mensaje\":\"Crea una reserva de spa para Pedro Ramirez el 20 de marzo de 2026 a las 11 AM por 120 minutos\"}"
+
+# Paso 5: Verificar reserva creada
+curl http://localhost:3003/reservas
+
+
+───────────────────────────────────────────────────────────────────
+  CASO 2: Probar Idempotencia (Prevención de Duplicados)
+───────────────────────────────────────────────────────────────────
+
+# Crear reserva con clave de idempotencia
+curl -X POST http://localhost:3003/reservas ^
+  -H "Content-Type: application/json" ^
+  -H "X-Idempotency-Key: test-key-12345" ^
+  -d "{\"clienteId\":1,\"servicioNombre\":\"Corte de cabello\",\"fechaReserva\":\"2026-03-15T10:00:00Z\",\"duracionMinutos\":60}"
+
+# Ejecutar EXACTAMENTE el mismo comando otra vez
+# Deberías recibir la MISMA respuesta sin crear una nueva reserva
+curl -X POST http://localhost:3003/reservas ^
+  -H "Content-Type: application/json" ^
+  -H "X-Idempotency-Key: test-key-12345" ^
+  -d "{\"clienteId\":1,\"servicioNombre\":\"Corte de cabello\",\"fechaReserva\":\"2026-03-15T10:00:00Z\",\"duracionMinutos\":60}"
+
+
+───────────────────────────────────────────────────────────────────
+  CASO 3: Manejo de Errores
+───────────────────────────────────────────────────────────────────
+
+# Error: Cliente inexistente
+curl -X POST http://localhost:3000/api/procesador ^
+  -H "Content-Type: application/json" ^
+  -d "{\"mensaje\":\"Busca al cliente Inexistente XYZ\"}"
+
+# Error: Fecha pasada
+curl -X POST http://localhost:3000/api/procesador ^
+  -H "Content-Type: application/json" ^
+  -d "{\"mensaje\":\"Crea una reserva para Juan Perez el 1 de enero de 2020\"}"
+
+# Error: Tool inexistente (JSON-RPC)
+curl -X POST http://localhost:3001/rpc ^
+  -H "Content-Type: application/json" ^
+  -d "{\"jsonrpc\":\"2.0\",\"method\":\"tools/call\",\"params\":{\"name\":\"tool_inexistente\",\"arguments\":{}},\"id\":99}"
+
+
+═══════════════════════════════════════════════════════════════════
+  📊 VERIFICAR LOGS
+═══════════════════════════════════════════════════════════════════
+
+# Ver logs de todos los servicios
+docker-compose logs -f
+
+# Ver logs de un servicio específico
+docker-compose logs -f api-gateway
+docker-compose logs -f mcp-server
+docker-compose logs -f backend-clientes
+docker-compose logs -f backend-reservas
+
+# Ver últimas 50 líneas
+docker-compose logs --tail=50 api-gateway
+
+
+═══════════════════════════════════════════════════════════════════
+  🔧 COMANDOS DOCKER ÚTILES
+═══════════════════════════════════════════════════════════════════
+
+# Ver estado de contenedores
+docker-compose ps
+
+# Reiniciar un servicio
+docker-compose restart api-gateway
+
+# Reiniciar todos los servicios
+docker-compose restart
+
+# Detener todos los servicios
+docker-compose down
+
+# Reconstruir e iniciar
+docker-compose up --build -d
+
+# Limpiar todo (incluye volúmenes y bases de datos)
+docker-compose down -v
+
+
+═══════════════════════════════════════════════════════════════════
+  ✅ CHECKLIST DE VERIFICACIÓN
+═══════════════════════════════════════════════════════════════════
+
+□ Todos los servicios están corriendo (5 contenedores)
+□ API Gateway responde en http://localhost:3000
+□ MCP Server responde en http://localhost:3001
+□ Backend Clientes responde en http://localhost:3002
+□ Backend Reservas responde en http://localhost:3003
+□ Puedo crear clientes vía REST
+□ Puedo listar los 3 Tools del MCP Server
+□ JSON-RPC 2.0 funciona correctamente
+□ GEMINI_API_KEY está configurada en .env
+□ Gemini ejecuta Tools con lenguaje natural
+□ Gemini ejecuta múltiples Tools en secuencia
+□ Idempotencia previene duplicados
+□ Los logs muestran el flujo completo
+
+
+═══════════════════════════════════════════════════════════════════
+  🎓 PARA LA DEMOSTRACIÓN DEL TALLER
+═══════════════════════════════════════════════════════════════════
+
+1. Mostrar arquitectura (README.md líneas 17-43)
+2. Ejecutar: docker-compose ps
+3. Crear 2-3 clientes vía REST (Sección 2)
+4. Mostrar Tools disponibles: curl http://localhost:3001/tools
+5. Demostrar búsqueda con IA (Sección 4.1)
+6. Demostrar validación con IA (Sección 4.2)
+7. Demostrar reserva completa con IA (Sección 4.3)
+8. Mostrar logs: docker-compose logs --tail=30 mcp-server
+9. Verificar datos: curl http://localhost:3003/reservas
+10. Explicar cumplimiento de rúbrica (100/100 puntos)
+
+
+═══════════════════════════════════════════════════════════════════
+  🚨 SOLUCIÓN DE PROBLEMAS
+═══════════════════════════════════════════════════════════════════
+
+Problema: "GEMINI_API_KEY no configurada"
+Solución: 
+  1. Edita .env con tu API Key real
+  2. docker-compose restart api-gateway
+
+Problema: "No se pudo conectar con el MCP Server"
+Solución:
+  1. docker ps (verificar que mcp-server esté corriendo)
+  2. docker-compose logs mcp-server
+
+Problema: Contenedor no inicia
+Solución:
+  1. docker-compose logs [nombre-servicio]
+  2. docker-compose down
+  3. docker-compose up --build -d
+
+Problema: Puerto ya en uso
+Solución:
+  1. docker-compose down
+  2. Cerrar aplicaciones que usen puertos 3000-3003
+  3. docker-compose up -d
+
+
+═══════════════════════════════════════════════════════════════════
+  📚 RECURSOS ADICIONALES
+═══════════════════════════════════════════════════════════════════
+
+• README.md - Documentación completa del proyecto
+• PRUEBAS.md - Guía detallada de pruebas
+• postman-collection.json - Colección de Postman
+• docker-compose.yml - Configuración de servicios
+
+• Gemini AI Studio: https://aistudio.google.com
+• MCP Documentation: https://modelcontextprotocol.io
+• JSON-RPC 2.0 Spec: https://www.jsonrpc.org/specification
+
+
+═══════════════════════════════════════════════════════════════════
+  ¡Buena suerte con tu taller! 🚀
+═══════════════════════════════════════════════════════════════════
+
