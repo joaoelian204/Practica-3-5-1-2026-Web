@@ -1,9 +1,9 @@
-FROM node:18-alpine
+FROM node:20-alpine
 
 WORKDIR /app
 
 # Instalar dependencias de compilación para better-sqlite3
-RUN apk add --no-cache python3 make g++
+RUN apk add --no-cache python3 py3-setuptools make g++
 
 # Copiar archivos de dependencias
 COPY package*.json ./

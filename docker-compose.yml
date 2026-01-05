@@ -48,6 +48,8 @@ services:
       PORT: 3003
       REDIS_HOST: redis
       REDIS_PORT: 6379
+      MICROSERVICIO_CLIENTES_HOST: backend-clientes
+      MICROSERVICIO_CLIENTES_PORT: 3002
     volumes:
       - ./apps/backend/reservas/data:/app/data
     depends_on:
